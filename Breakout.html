@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <title>Breakout</title>
+  
+  <h1>Breakout</h1>
+   <h2>Para pobres</h2>
+    <style>
+
+     * { padding: 0; margin: 0; }
+
+      canvas { background: #eee; display: block; margin: 0 auto; 
+      border: 2px solid #4A148C
+      }
+
+      h1 {text-align: center;}
+h2 {text-align: center;}
+
+svg {
+  position: absolute;
+  top: 50%;
+  left: 10%;
+  transform: translate(-50%, -50%);
+}
+
+html {
+  background-image: url('data:image/svg+xml,%3Csvg width="52" height="26" viewBox="0 0 52 26" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%239C92AC" fill-opacity="0.4"%3E%3Cpath d="M10 10c0-2.21-1.79-4-4-4-3.314 0-6-2.686-6-6h2c0 2.21 1.79 4 4 4 3.314 0 6 2.686 6 6 0 2.21 1.79 4 4 4 3.314 0 6 2.686 6 6 0 2.21 1.79 4 4 4v2c-3.314 0-6-2.686-6-6 0-2.21-1.79-4-4-4-3.314 0-6-2.686-6-6zm25.464-1.95l8.486 8.486-1.414 1.414-8.486-8.486 1.414-1.414z" /%3E%3C/g%3E%3C/g%3E%3C/svg%3E');
+}
+
+    </style>
+</head>
+<body>
+
+  <svg viewBox="0 0 496 512" width="100" title="angry">
+  <path d="M248 8C111 8 0 119 0 256s111 248 248 248 248-111 248-248S385 8 248 8zM136 240c0-9.3 4.1-17.5 10.5-23.4l-31-9.3c-8.5-2.5-13.3-11.5-10.7-19.9 2.5-8.5 11.4-13.2 19.9-10.7l80 24c8.5 2.5 13.3 11.5 10.7 19.9-2.1 6.9-8.4 11.4-15.3 11.4-.5 0-1.1-.2-1.7-.2.7 2.7 1.7 5.3 1.7 8.2 0 17.7-14.3 32-32 32S136 257.7 136 240zm168 154.2c-27.8-33.4-84.2-33.4-112.1 0-13.5 16.3-38.2-4.2-24.6-20.5 20-24 49.4-37.8 80.6-37.8s60.6 13.8 80.6 37.8c13.8 16.5-11.1 36.6-24.5 20.5zm76.6-186.9l-31 9.3c6.3 5.8 10.5 14.1 10.5 23.4 0 17.7-14.3 32-32 32s-32-14.3-32-32c0-2.9.9-5.6 1.7-8.2-.6.1-1.1.2-1.7.2-6.9 0-13.2-4.5-15.3-11.4-2.5-8.5 2.3-17.4 10.7-19.9l80-24c8.4-2.5 17.4 2.3 19.9 10.7 2.5 8.5-2.3 17.4-10.8 19.9z" />
+</svg>
+
+<canvas id="myCanvas" width="500" height="750"></canvas>
+
+<script>
+
+  // JavaScript code goes here
+
+var canvas = document.getElementById("myCanvas");
+  
+var ctx = canvas.getContext("2d");
+var ballRadius = 10;
+var x = canvas.width/2;
+var y = canvas.height-30;
+var dx = 2;
+var dy = -2;
+var paddleHeight = 10;
+var paddleWidth = 100;
+var paddleX = (canvas.width-paddleWidth)/2;
+var rightPressed = false;
+var leftPressed = false;
+var brickRowCount = 6;
+var brickColumnCount = 8;
+var brickWidth = 65;
+var brickHeight = 20;
+var brickPadding = 10;
+var brickOffsetTop = 30;
+var brickOffsetLeft = 30;
+var score = 0;
+var lives = 3;
+  
+
+var bricks = [];
+for(var c=0; c<brickColumnCount; c++) {
+    bricks[c] = [];
+    for(var r=0; r<brickRowCount; r++) {
+        bricks[c][r] = { x: 0, y: 0, status: 1 }; // agregamos la propiedad status y lo establecemos en 1
+    }
+}
+
+document.addEventListener("keydown", keyDownHandler, false);
+document.addEventListener("keyup", keyUpHandler, false);
+
+
+function keyDownHandler(e) {
+if(e.key == "Right" || e.key == "ArrowRight") {
+        rightPressed = true;
+    }
+
+    else if(e.key == "Left" || e.key == "ArrowLeft") {
+        leftPressed = true;
+    }
+}
+
+function keyUpHandler(e) {
+    if(e.key == "Right" || e.key == "ArrowRight") {
+        rightPressed = false;
+    }
+  
+    else if(e.key == "Left" || e.key == "ArrowLeft") {
+        leftPressed = false;
+    }
+}
+
+function collisionDetection() {
+for(var c=0; c<brickColumnCount; c++) {
+  for(var r=0; r<brickRowCount; r++) {
+    var b = bricks[c][r];
+    if(b.status == 1) {
+      if(x > b.x && x < b.x+brickWidth && y > b.y && y < b.y+brickHeight) {
+        dy = -dy;
+        b.status = 0;
+        score++;
+        if(score == brickRowCount*brickColumnCount) {
+          alert("Ganasteprro");
+          document.location.reload();
+
+        }
+
+      }
+
+    }
+
+  }
+
+}
+
+}
+
+
+function drawBall() {
+  // Agregar imagen
+ // var img = document.createElement("img");
+ // img.src = "https://www.gifsanimados.org/data/media/418/pelota-imagen-animada-0049.gif"; // Reemplaza con la URL de la imagen que deseas usar
+ // img.onload = function() {
+   // console.log("La imagen se cargó correctamente.");
+
+    // Dibujar círculo azul
+    ctx.beginPath();
+    ctx.arc(x, y, ballRadius, 0, Math.PI*2);
+    ctx.fillStyle = "#AA00FF";
+    ctx.fill();
+    ctx.closePath();
+
+    // Dibujar imagen en la bola
+    //ctx.beginPath();
+    //ctx.arc(x, y, ballRadius, 0, Math.PI*2);
+    //ctx.closePath();
+    //ctx.save(); // Guardar el contexto actual
+    //ctx.clip(); // Aplicar el recorte circular al contexto
+    //ctx.drawImage(img, x - ballRadius, y - ballRadius, ballRadius*2, ballRadius*2);
+    //ctx.restore(); // Restaurar el contexto anterior (sin el recorte)
+  };
+
+
+
+
+  
+function drawPaddle() {
+
+    ctx.beginPath();
+    ctx.rect(paddleX, canvas.height-paddleHeight, paddleWidth, paddleHeight);
+    ctx.fillStyle = "#4A148C";
+    ctx.fill();
+    ctx.closePath();
+
+}
+  
+function drawBricks() {
+
+for(var c=0; c<brickColumnCount; c++) {
+
+  for(var r=0; r<brickRowCount; r++) {
+
+    if(bricks[c][r].status == 1) {
+
+      var brickX = (r*(brickWidth+brickPadding))+brickOffsetLeft;
+
+      var brickY = (c*(brickHeight+brickPadding))+brickOffsetTop;
+
+      bricks[c][r].x = brickX;
+
+      bricks[c][r].y = brickY;
+
+      ctx.beginPath();
+
+      ctx.rect(brickX, brickY, brickWidth, brickHeight);
+
+      ctx.fillStyle = "#4A148C";
+
+      ctx.fill();
+
+      ctx.closePath();
+
+    }
+
+  }
+
+}
+
+}
+
+function drawScore() {
+ctx.font = "16px Arial";
+ctx.fillStyle = "#4A148C";
+ctx.fillText("Score: "+score, 8, 20);
+
+}
+
+function drawLives() {
+ctx.font = "16px Arial";
+ctx.fillStyle = "#4A148C";
+ctx.fillText("Lives: "+lives, canvas.width-65, 20);
+
+}
+  
+
+function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    drawBricks();
+    drawBall();
+    drawPaddle();
+    drawScore();
+    drawLives();
+    collisionDetection();
+    
+    if(x + dx > canvas.width-ballRadius || x + dx < ballRadius) {
+
+   dx = -dx;
+
+    }
+
+if(y + dy < ballRadius) {
+
+dy = -dy;
+
+}
+
+else if(y + dy > canvas.height-ballRadius) {
+
+if(x > paddleX && x < paddleX + paddleWidth) {
+
+  dy = -dy;
+
+}
+
+else {
+
+  lives--;
+
+  if(!lives) {
+    alert("CAGASTE");
+    document.location.reload();
+  }
+
+  else {
+    x = canvas.width/2;
+    y = canvas.height-30;
+    dx = 3;
+    dy = -3;
+    paddleX = (canvas.width-paddleWidth)/2;
+  }
+
+}
+
+}
+
+if(rightPressed && paddleX < canvas.width-paddleWidth) {
+paddleX += 7;
+}
+else if(leftPressed && paddleX > 0) {
+paddleX -= 7;
+}
+x += dx;
+y += dy;
+
+requestAnimationFrame(draw);
+
+}
+
+
+
+draw();
+
+</script>
+  
+
+
+    <style>
+
+      * { padding: 0; margin: 0; }
+
+      canvas { background: #eee; display: block; margin: 0 auto; }
+
+    </style>
+
+</head>
+
+<body>
+
+
+</script>
+</body>
+</html>
